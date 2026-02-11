@@ -48,7 +48,7 @@ app.get('/start', (req, res) => {
     saveTokens(tokens);
 
     // Redirect ke Linkvertise dengan token
-    res.redirect(`https://linkvertise.com/XXXXX/get-key?r=${newToken}`);
+    res.redirect(`https://linkvertise.com/https://link-hub.net/3411951/vB1f7MYaeneJ/get-key?r=${newToken}`);
 });
 
 // =====================
