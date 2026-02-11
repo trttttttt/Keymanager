@@ -40,7 +40,7 @@ app.get('/getkey', (req, res) => {
     res.send(`
         <h1>Key Kau:</h1>
         <h2 style="color:green">${newKey}</h2>
-        <p>Key ni expire dalam 24 jam!</p>
+        <p>Key ni expire dalam 12 jam!</p>
         <p>Copy key ni dan masukkan dalam executor.</p>
     `);
 });
