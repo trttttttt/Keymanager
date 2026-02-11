@@ -31,7 +31,7 @@ app.get('/getkey', (req, res) => {
     keys[newKey] = {
         used: false,
         created_at: Date.now(),
-        expires_at: Date.now() + (24 * 60 * 60 * 1000) // 24 jam
+        expires_at: Date.now() + (12 * 60 * 60 * 1000) // 12 jam
     };
 
     saveKeys(keys);
