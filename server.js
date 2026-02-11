@@ -39,7 +39,7 @@ app.get('/start', (req, res) => {
         expires_at: Date.now() + (10 * 60 * 1000)
     };
     saveTokens(tokens);
-    res.redirect('https://link-hub.net/3411951/vB1f7MYaeneJ?r=' + newToken);
+    res.redirect('https://link-hub.net/3411951/vB1f7MYaeneJ?r=https://keymanager-production-f858.up.railway.app/getkey?token=' + newToken);
 });
 
 app.get('/getkey', (req, res) => {
@@ -61,6 +61,38 @@ app.get('/getkey', (req, res) => {
     }
 
     tokens[token].used = true;
+    saveTokens(tokens);
+
+    const keys = loadKeys();
+    const newKey = generateKey();
+    keys[newKey] = {
+        used: false,
+        created_at: Date.now(),
+        expires_at: Date.now() + (12 * 60 * 60 * 1000)
+    };
+    saveKeys(keys);
+
+    res.send('<h1>Key Kau:</h1><h2 style="color:green">' + newKey + '</h2><p>Key expire dalam 12 jam!</p>');
+});
+
+app.get('/verify', (req, res) => {
+    const key = req.query.key;
+    const keys = loadKeys();
+
+    if (!key || !keys[key]) {
+        return res.json({ valid: false, reason: 'Key tidak wujud' });
+    }
+
+    if (Date.now() > keys[key].expires_at) {
+        delete keys[key];
+        saveKeys(keys);
+        return res.json({ valid: false, reason: 'Key dah expire' });
+    }
+
+    return res.json({ valid: true, reason: 'Key sah!' });
+});
+
+app.listen(3000, () => console.log('Server running'));    tokens[token].used = true;
     saveTokens(tokens);
 
     const keys = loadKeys();
