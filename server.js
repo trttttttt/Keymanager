@@ -3,7 +3,7 @@ const app = express();
 const fs = require('fs');
 
 const KEY_FILE = 'keys.json';
-const SECRET = 'masukkan_password_rahsia_kau_sini'; // TUKAR NI!
+const SECRET = 'SIGMA2026-MELAYU-HUB'; // TUKAR NI!
 
 function loadKeys() {
     if (!fs.existsSync(KEY_FILE)) return {};
