@@ -3,7 +3,7 @@ const app = express();
 const fs = require('fs');
 
 const KEY_FILE = 'keys.json';
-const SECRET = 'SIGMA2026-MELAYU-HUB'; // TUKAR NI!
+const SECRET = 'SIGMA2026MELAYUHUB'; // TUKAR NI!
 
 function loadKeys() {
     if (!fs.existsSync(KEY_FILE)) return {};
