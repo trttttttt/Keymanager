@@ -31,15 +31,10 @@ function generateToken() {
     return [...Array(40)].map(() => Math.random().toString(36)[2]).join('');
 }
 
-// =====================
-// ROUTE: Linkvertise redirect ke sini dulu
-// Jana token sekali guna
-// =====================
 app.get('/start', (req, res) => {
     const tokens = loadTokens();
     const newToken = generateToken();
 
-    // Token expire dalam 10 minit
     tokens[newToken] = {
         used: false,
         expires_at: Date.now() + (10 * 60 * 1000)
@@ -47,50 +42,79 @@ app.get('/start', (req, res) => {
 
     saveTokens(tokens);
 
-    // Redirect ke Linkvertise dengan token
-    res.redirect(`https://linkvertise.com/https://link-hub.net/3411951/vB1f7MYaeneJ/get-key?r=${newToken}`);
+    res.redirect(`https://link-hub.net/3411951/vB1f7MYaeneJ?r=${newToken}`);
 });
 
-// =====================
-// ROUTE: Lepas complete Linkvertise
-// =====================
 app.get('/getkey', (req, res) => {
     const token = req.query.token;
     const tokens = loadTokens();
 
-    // Semak token wujud
     if (!token || !tokens[token]) {
         return res.send(`
             <h1 style="color:red">❌ Akses Ditolak!</h1>
             <p>Guna link yang betul untuk dapat key.</p>
+            <a href="https://keymanager-production-f858.up.railway.app/start">Klik sini cuba semula</a>
         `);
     }
 
-    // Semak token dah guna
     if (tokens[token].used) {
         return res.send(`
             <h1 style="color:red">❌ Link Dah Digunakan!</h1>
             <p>Setiap link hanya boleh guna sekali.</p>
+            <a href="https://keymanager-production-f858.up.railway.app/start">Klik sini cuba semula</a>
         `);
     }
 
-    // Semak token expire
     if (Date.now() > tokens[token].expires_at) {
         delete tokens[token];
         saveTokens(tokens);
         return res.send(`
             <h1 style="color:red">❌ Link Dah Expire!</h1>
             <p>Ulang semula dari awal.</p>
+            <a href="https://keymanager-production-f858.up.railway.app/start">Klik sini cuba semula</a>
         `);
     }
 
-    // Mark token sebagai dah guna
     tokens[token].used = true;
     saveTokens(tokens);
 
-    // Jana key
     const keys = loadKeys();
     const newKey = generateKey();
+
+    keys[newKey] = {
+        used: false,
+        created_at: Date.now(),
+        expires_at: Date.now() + (12 * 60 * 60 * 1000)
+    };
+
+    saveKeys(keys);
+
+    res.send(`
+        <h1>✅ Key Kau:</h1>
+        <h2 style="color:green">${newKey}</h2>
+        <p>Key ni expire dalam 12 jam!</p>
+        <p>Copy key ni dan masukkan dalam executor.</p>
+    `);
+});
+
+app.get('/verify', (req, res) => {
+    const key = req.query.key;
+    const keys = loadKeys();
+
+    if (!key || !keys[key]) {
+        return res.json({ valid: false, reason: 'Key tidak wujud' });
+    }
+
+    if (Date.now() > keys[key].expires_at) {
+        delete keys[key];
+        saveKeys(keys);
+        return res.json({ valid: false, reason: 'Key dah expire' });
+    }
+
+    return res.json({ valid: true, reason: 'Key sah!' });
+});
+
+app.listen(3000, () => console.log('Server running on port 3000'));    const newKey = generateKey();
 
     keys[newKey] = {
         used: false,
