@@ -3,28 +3,36 @@ const app = express();
 const fs = require('fs');
 
 const KEY_FILE = 'keys.json';
+const SECRET = 'masukkan_password_rahsia_kau_sini'; // TUKAR NI!
 
-// Load keys dari file
 function loadKeys() {
     if (!fs.existsSync(KEY_FILE)) return {};
     return JSON.parse(fs.readFileSync(KEY_FILE));
 }
 
-// Save keys ke file
 function saveKeys(keys) {
     fs.writeFileSync(KEY_FILE, JSON.stringify(keys));
 }
 
-// Generate random key
 function generateKey() {
     return [...Array(30)].map(() => Math.random().toString(36)[2]).join('').toUpperCase();
 }
 
 // =====================
-// ROUTE 1: Generate Key
-// Linkvertise redirect ke sini
+// ROUTE: Generate Key
 // =====================
 app.get('/getkey', (req, res) => {
+    const token = req.query.token;
+
+    // Kalau takde token atau token salah = reject
+    if (!token || token !== SECRET) {
+        return res.send(`
+            <h1 style="color:red">❌ Akses Ditolak!</h1>
+            <p>Kau kena guna link yang betul untuk dapat key.</p>
+            <a href="https://linkvertise.com/XXXXX/get-key">Klik sini untuk dapat key</a>
+        `);
+    }
+
     const keys = loadKeys();
     const newKey = generateKey();
 
@@ -36,9 +44,8 @@ app.get('/getkey', (req, res) => {
 
     saveKeys(keys);
 
-    // Tunjuk key kat user
     res.send(`
-        <h1>Key Kau:</h1>
+        <h1>✅ Key Kau:</h1>
         <h2 style="color:green">${newKey}</h2>
         <p>Key ni expire dalam 12 jam!</p>
         <p>Copy key ni dan masukkan dalam executor.</p>
@@ -46,8 +53,7 @@ app.get('/getkey', (req, res) => {
 });
 
 // =====================
-// ROUTE 2: Verify Key
-// Script executor call sini
+// ROUTE: Verify Key
 // =====================
 app.get('/verify', (req, res) => {
     const key = req.query.key;
@@ -59,7 +65,6 @@ app.get('/verify', (req, res) => {
 
     const keyData = keys[key];
 
-    // Check expire
     if (Date.now() > keyData.expires_at) {
         delete keys[key];
         saveKeys(keys);
